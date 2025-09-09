@@ -117,9 +117,9 @@ namespace SudokuSolver.Test
                 Searcher.SearchCandidates(row, column, frame);
                 Assert.Fail();
             }
-            catch (Searcher.SearcherError ex)
+            catch (SudokuError ex)
             {
-                if (ex.Type == Searcher.SearcherError.ErrorType.RowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.RowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
 
@@ -140,9 +140,9 @@ namespace SudokuSolver.Test
                 Searcher.SearchCandidates(row, column, frame);
                 Assert.Fail();
             }
-            catch (Searcher.SearcherError ex)
+            catch (SudokuError ex)
             {
-                if (ex.Type == Searcher.SearcherError.ErrorType.ColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.ColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }
@@ -161,9 +161,9 @@ namespace SudokuSolver.Test
                 Searcher.SearchCandidates(row, column, frame);
                 Assert.Fail();
             }
-            catch (Searcher.SearcherError ex)
+            catch (SudokuError ex)
             {
-                if (ex.Type == Searcher.SearcherError.ErrorType.FrameRowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.FrameRowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }
@@ -183,9 +183,9 @@ namespace SudokuSolver.Test
                 Searcher.SearchCandidates(row, column, frame);
                 Assert.Fail();
             }
-            catch (Searcher.SearcherError ex)
+            catch (SudokuError ex)
             {
-                if (ex.Type == Searcher.SearcherError.ErrorType.FrameColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.FrameColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }

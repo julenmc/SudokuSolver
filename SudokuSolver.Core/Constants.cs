@@ -1,7 +1,7 @@
 namespace SudokuSolver.Core
 {
     [Flags]
-    public enum Candidates : ushort
+    internal enum Candidates : ushort
     {
         None = 0,
         One = 1 << 0,       // 0b000000001
@@ -18,7 +18,38 @@ namespace SudokuSolver.Core
 
     internal static class Constants
     {
+        internal static Dictionary<ushort, Candidates> NumberMap = new Dictionary<ushort, Candidates>()
+        {
+            { 1, Candidates.One },
+            { 2, Candidates.Two },
+            { 3, Candidates.Three },
+            { 4, Candidates.Four },
+            { 5, Candidates.Five },
+            { 6, Candidates.Six },
+            { 7, Candidates.Seven },
+            { 8, Candidates.Eight },
+            { 9, Candidates.Nine },
+        };
+
         internal static int SudokuSize = 9;
         internal static int FrameSize = 3;
+    }
+
+    internal class SudokuError : Exception
+    {
+        internal enum ErrorType
+        {
+            None,
+            RowCountError,
+            ColumnCountError,
+            FrameRowCountError,
+            FrameColumnCountError,
+            SudokuUncompleted,
+            UnknownError
+        }
+
+        internal ErrorType Type = ErrorType.None;
+
+        internal SudokuError(ErrorType type) { Type = type; }
     }
 }

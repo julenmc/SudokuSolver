@@ -13,7 +13,7 @@
 
         private static Candidates SearchRow(Candidates[] row)
         {
-            if (row.Length != Constants.SudokuSize) throw new SearcherError(SearcherError.ErrorType.RowCountError);
+            if (row.Length != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.RowCountError);
 
             var posibles = Candidates.All;
             foreach (Candidates cell in row)
@@ -26,7 +26,7 @@
 
         private static Candidates SearchColumn(Candidates[] column)
         {
-            if (column.Length != Constants.SudokuSize) throw new SearcherError(SearcherError.ErrorType.ColumnCountError);
+            if (column.Length != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
 
             var posibles = Candidates.All;
             foreach (Candidates cell in column)
@@ -39,8 +39,8 @@
 
         private static Candidates SearchFrame(Candidates[,] frame)
         {
-            if (frame.GetLength(0) != Constants.FrameSize) throw new SearcherError(SearcherError.ErrorType.FrameRowCountError);
-            if (frame.GetLength(1) != Constants.FrameSize) throw new SearcherError(SearcherError.ErrorType.FrameColumnCountError);
+            if (frame.GetLength(0) != Constants.FrameSize) throw new SudokuError(SudokuError.ErrorType.FrameRowCountError);
+            if (frame.GetLength(1) != Constants.FrameSize) throw new SudokuError(SudokuError.ErrorType.FrameColumnCountError);
 
             var posibles = Candidates.All;
             for (int i = 0; i < Constants.FrameSize; i++)
@@ -52,22 +52,6 @@
             }
 
             return posibles;
-        }
-
-        internal class SearcherError : Exception
-        {
-            internal enum ErrorType
-            {
-                None,
-                RowCountError,
-                ColumnCountError,
-                FrameRowCountError,
-                FrameColumnCountError
-            }
-
-            internal ErrorType Type = ErrorType.None;
-
-            internal SearcherError(ErrorType type) { Type = type; }
         }
     }
 }
