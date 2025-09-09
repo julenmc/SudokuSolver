@@ -16,22 +16,9 @@ namespace SudokuSolver.Core
         All = (1 << 9) - 1  // 0b111111111
     }
 
-    internal static class Constants
+    public static class Constants
     {
-        internal static Dictionary<ushort, Candidates> NumberMap = new Dictionary<ushort, Candidates>()
-        {
-            { 1, Candidates.One },
-            { 2, Candidates.Two },
-            { 3, Candidates.Three },
-            { 4, Candidates.Four },
-            { 5, Candidates.Five },
-            { 6, Candidates.Six },
-            { 7, Candidates.Seven },
-            { 8, Candidates.Eight },
-            { 9, Candidates.Nine },
-        };
-
-        internal static int SudokuSize = 9;
+        public static int SudokuSize = 9;
         internal static int FrameSize = 3;
     }
 
@@ -44,12 +31,15 @@ namespace SudokuSolver.Core
             ColumnCountError,
             FrameRowCountError,
             FrameColumnCountError,
-            SudokuUncompleted,
+            SudokuUncompletedError,
+            MultipleCandidatesError,
+            SudokuUnsolvable,
             UnknownError
         }
 
         internal ErrorType Type = ErrorType.None;
 
         internal SudokuError(ErrorType type) { Type = type; }
+        internal SudokuError(ErrorType type, string message) : base(message) { Type = type; }
     }
 }

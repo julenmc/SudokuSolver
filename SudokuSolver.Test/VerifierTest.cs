@@ -36,7 +36,24 @@ namespace SudokuSolver.Test
             }
             catch (SudokuError ex)
             {
-                if (ex.Type == SudokuError.ErrorType.SudokuUncompleted) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.SudokuUncompletedError) Console.WriteLine($"OK. Error: {ex.Type}");
+                else Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        public void MultipleCandidates()
+        {
+            Candidates[,] sudoku = FilledSudoku;
+            sudoku[0, 0] = Candidates.One | Candidates.Two;
+            try
+            {
+                Verifier.VerifySudoku(sudoku);
+                Assert.Fail();
+            }
+            catch (SudokuError ex)
+            {
+                if (ex.Type == SudokuError.ErrorType.MultipleCandidatesError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }
@@ -46,7 +63,7 @@ namespace SudokuSolver.Test
         {
             Candidates[,] sudoku = FilledSudoku;
             sudoku[0, 1] = Candidates.One;
-            Assert.IsFalse(Verifier.VerifyRow(ArrayTools<Candidates>.GetRow(sudoku, 0)));
+            Assert.IsFalse(Verifier.VerifyRow(ArrayUtils<Candidates>.GetRow(sudoku, 0)));
         }
 
         [TestMethod]
@@ -54,7 +71,7 @@ namespace SudokuSolver.Test
         {
             Candidates[,] sudoku = FilledSudoku;
             sudoku[1, 0] = Candidates.One;
-            Assert.IsFalse(Verifier.VerifyColumn(ArrayTools<Candidates>.GetColumn(sudoku, 0)));
+            Assert.IsFalse(Verifier.VerifyColumn(ArrayUtils<Candidates>.GetColumn(sudoku, 0)));
         }
 
         [TestMethod]
@@ -62,7 +79,7 @@ namespace SudokuSolver.Test
         {
             Candidates[,] sudoku = FilledSudoku;
             sudoku[1, 1] = Candidates.One;
-            Assert.IsFalse(Verifier.VerifyFrame(ArrayTools<Candidates>.Slice2DArray(sudoku, 0, 0, Constants.FrameSize)));
+            Assert.IsFalse(Verifier.VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(sudoku, 0, 0, Constants.FrameSize)));
         }
 
         #region InputError

@@ -18,7 +18,7 @@
             var posibles = Candidates.All;
             foreach (Candidates cell in row)
             {
-                if (cell != Candidates.None) posibles &= ~cell;
+                if (cell != Candidates.None && (cell & (cell - 1)) == 0) posibles &= ~cell;
             }
 
             return posibles;
@@ -31,7 +31,7 @@
             var posibles = Candidates.All;
             foreach (Candidates cell in column)
             {
-                if (cell != Candidates.None) posibles &= ~cell;
+                if (cell != Candidates.None && (cell & (cell - 1)) == 0) posibles &= ~cell;
             }
 
             return posibles;
@@ -47,7 +47,7 @@
             {
                 for (int j = 0; j < Constants.FrameSize; j++)
                 {
-                    if (frame[i,j] != Candidates.None) posibles &= ~frame[i,j];
+                    if (frame[i,j] != Candidates.None && (frame[i,j] & (frame[i,j] - 1)) == 0) posibles &= ~frame[i,j];
                 }
             }
 

@@ -13,20 +13,52 @@ namespace SudokuSolver.Core
                 // Check rows
                 for (int i = 0; i < Constants.SudokuSize; i++)
                 {
-                    if (!VerifyRow(ArrayTools<Candidates>.GetRow(matrix, i)))
+                    try
                     {
-                        Console.WriteLine($"Row {i} has a repeated value");
-                        return false;
+                        if (!VerifyRow(ArrayUtils<Candidates>.GetRow(matrix, i)))
+                        {
+                            Console.WriteLine($"Row {i} has a repeated value");
+                            return false;
+                        }
+                    }
+                    catch (SudokuError ex)
+                    {
+                        switch (ex.Type)
+                        {
+                            case SudokuError.ErrorType.SudokuUncompletedError:
+                                throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+
+                            case SudokuError.ErrorType.MultipleCandidatesError:
+                                throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+
+                            default: throw;
+                        }
                     }
                 }
 
                 // Check columns
                 for (int i = 0; i < Constants.SudokuSize; i++)
                 {
-                    if (!VerifyColumn(ArrayTools<Candidates>.GetColumn(matrix, i)))
+                    try
                     {
-                        Console.WriteLine($"Column {i} has a repeated value");
-                        return false;
+                        if (!VerifyColumn(ArrayUtils<Candidates>.GetColumn(matrix, i)))
+                        {
+                            Console.WriteLine($"Column {i} has a repeated value");
+                            return false;
+                        }
+                    }
+                    catch (SudokuError ex)
+                    {
+                        switch (ex.Type)
+                        {
+                            case SudokuError.ErrorType.SudokuUncompletedError:
+                                throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+
+                            case SudokuError.ErrorType.MultipleCandidatesError:
+                                throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+
+                            default: throw;
+                        }
                     }
                 }
 
@@ -40,12 +72,28 @@ namespace SudokuSolver.Core
                     columnStart = 0;
                     for (int j = 0; j < iterations; j++)
                     {
-                        if (!VerifyFrame(ArrayTools<Candidates>.Slice2DArray(matrix, rowStart, columnStart, Constants.FrameSize)))
+                        try
                         {
-                            Console.WriteLine($"Frame in {i}{j} has a repeated value");
-                            return false;
+                            if (!VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(matrix, rowStart, columnStart, Constants.FrameSize)))
+                            {
+                                Console.WriteLine($"Frame in {i}{j} has a repeated value");
+                                return false;
+                            }
+                            columnStart += Constants.FrameSize;
                         }
-                        columnStart += Constants.FrameSize;
+                        catch (SudokuError ex)
+                        {
+                            switch (ex.Type)
+                            {
+                                case SudokuError.ErrorType.SudokuUncompletedError:
+                                    throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+
+                                case SudokuError.ErrorType.MultipleCandidatesError:
+                                    throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+
+                                default: throw;
+                            }
+                        }
                     }
                     rowStart += Constants.FrameSize;
                 }
@@ -67,7 +115,8 @@ namespace SudokuSolver.Core
             Candidates posibles = Candidates.All;
             foreach (Candidates cell in row)
             {
-                if (cell == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompleted);
+                if (cell == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError);
+                if ((cell & (cell - 1)) != 0) throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError);
                 posibles &= ~cell;
             }
             return posibles == Candidates.None;
@@ -78,7 +127,8 @@ namespace SudokuSolver.Core
             Candidates posibles = Candidates.All;
             foreach (Candidates cell in column)
             {
-                if (cell == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompleted);
+                if (cell == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError);
+                if ((cell & (cell - 1)) != 0) throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError);
                 posibles &= ~cell;
             }
             return posibles == Candidates.None;
@@ -91,7 +141,8 @@ namespace SudokuSolver.Core
             {
                 for (int j = 0; j < Constants.FrameSize; j++)
                 {
-                    if (frame[i, j] == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompleted);
+                    if (frame[i, j] == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError);
+                    if ((frame[i, j] & (frame[i, j] - 1)) != 0) throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError);
                     posibles &= ~frame[i, j];
                 }
             }

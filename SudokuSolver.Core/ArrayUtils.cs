@@ -1,19 +1,25 @@
 namespace SudokuSolver.Core
 {
-    internal static class ArrayTools<T>
+    internal static class ArrayUtils<T>
     {
         internal static T[] GetColumn(T[,] matrix, int columnNumber)
         {
-            return Enumerable.Range(0, matrix.GetLength(0))
-                    .Select(x => matrix[x, columnNumber])
-                    .ToArray();
+            var result = new T[Constants.SudokuSize];
+            for (int r = 0; r < Constants.SudokuSize; r++)
+            {
+                result[r] = matrix[r, columnNumber];
+            }
+            return result;
         }
 
         internal static T[] GetRow(T[,] matrix, int rowNumber)
         {
-            return Enumerable.Range(0, matrix.GetLength(1))
-                    .Select(x => matrix[rowNumber, x])
-                    .ToArray();
+            var result = new T[Constants.SudokuSize];
+            for (int c = 0; c < Constants.SudokuSize; c++)
+            {
+                result[c] = matrix[rowNumber, c];
+            }
+            return result;
         }
 
         internal static T[,] Slice2DArray(T[,] matrix, int rowStart, int columnStart, int size)
