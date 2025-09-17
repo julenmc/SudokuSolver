@@ -5,7 +5,7 @@ namespace SudokuSolver.Core
         internal static bool VerifySudoku(Candidates[,] matrix)
         {
             // Chek input
-            if (matrix.GetLength(0) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.RowCountError);
+            if (matrix.GetLength(0) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
             if (matrix.GetLength(1) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
 
             try

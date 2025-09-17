@@ -105,7 +105,7 @@ namespace SudokuSolver.Test
             }
             catch (SudokuError ex)
             {
-                if (ex.Type == SudokuError.ErrorType.RowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.ArrayCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }

@@ -27,7 +27,7 @@ namespace SudokuSolver.Core
         internal enum ErrorType
         {
             None,
-            RowCountError,
+            ArrayCountError,
             ColumnCountError,
             FrameRowCountError,
             FrameColumnCountError,

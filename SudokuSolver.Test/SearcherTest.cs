@@ -119,7 +119,7 @@ namespace SudokuSolver.Test
             }
             catch (SudokuError ex)
             {
-                if (ex.Type == SudokuError.ErrorType.RowCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.ArrayCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
 
@@ -189,7 +189,7 @@ namespace SudokuSolver.Test
                 else Assert.Fail();
             }
         }
-        
+
         #endregion
     }
 
@@ -289,6 +289,57 @@ namespace SudokuSolver.Test
             };
 
             Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+        }
+    }
+
+    [TestClass]
+    public sealed class SearcherNumberCellValue
+    {
+        [TestMethod]
+        public void Array()
+        {
+            Candidates[] array = {
+                Candidates.One | Candidates.Two,
+                Candidates.Two | Candidates.Three,
+                Candidates.Three | Candidates.Four,
+                Candidates.Four | Candidates.Five,
+                Candidates.Five | Candidates.Six,
+                Candidates.Six | Candidates.Seven,
+                Candidates.Seven | Candidates.Eight,
+                Candidates.Eight | Candidates.Nine,
+                Candidates.Eight | Candidates.Nine
+            };
+            Assert.AreEqual(0, Searcher.SearchNumberCellValueInArray(array, Candidates.One));
+        }
+
+        [TestMethod]
+        public void Frame()
+        {
+            Candidates[,] frame = {
+                { Candidates.One | Candidates.Two, Candidates.Two | Candidates.Three, Candidates.Three | Candidates.Four },
+                { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
+            };
+            var res = Searcher.SearchNumberCellValueInFrame(frame, Candidates.One);
+            Assert.AreEqual(0, res.Item1);
+            Assert.AreEqual(0, res.Item2);
+        }
+
+        [TestMethod]
+        public void AlreadyAssigned()
+        {
+            Candidates[] array = {
+                Candidates.One,
+                Candidates.Two | Candidates.Three,
+                Candidates.Three | Candidates.Four,
+                Candidates.Four | Candidates.Five,
+                Candidates.Five | Candidates.Six,
+                Candidates.Six | Candidates.Seven,
+                Candidates.Seven | Candidates.Eight,
+                Candidates.Eight | Candidates.Nine,
+                Candidates.Eight | Candidates.Nine
+            };
+            Assert.AreEqual(-1, Searcher.SearchNumberCellValueInArray(array, Candidates.One));
         }
     }
 }
