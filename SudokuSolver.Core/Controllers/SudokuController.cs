@@ -1,25 +1,26 @@
-using System.Globalization;
+using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Services;
 
-namespace SudokuSolver.Core
+namespace SudokuSolver.Core.Controllers
 {
-    public class Manager
+    public class SudokuController
     {
         private Candidates[,] _unfilledSudoku;
         private Candidates[,] _filledSudoku;
         bool _changeMade = false;
         bool _firstCheck = true;
 
-        public Manager(int[,] sudoku)
+        public SudokuController(int[,] sudoku)
         {
             // Chek input
-            if (sudoku.GetLength(0) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
-            if (sudoku.GetLength(1) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
+            if (sudoku.GetLength(0) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
+            if (sudoku.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
 
-            _unfilledSudoku = new Candidates[Constants.SudokuSize, Constants.SudokuSize];
+            _unfilledSudoku = new Candidates[ConstantData.SudokuSize, ConstantData.SudokuSize];
             _filledSudoku = _unfilledSudoku;
-            for (int i = 0; i < Constants.SudokuSize; i++)
+            for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
-                for (int j = 0; j < Constants.SudokuSize; j++)
+                for (int j = 0; j < ConstantData.SudokuSize; j++)
                 {
                     _unfilledSudoku[i, j] = CandidateUtils.FromInt(sudoku[i, j]);
                 }
@@ -32,9 +33,9 @@ namespace SudokuSolver.Core
             do
             {
                 _changeMade = false;
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
-                    for (int j = 0; j < Constants.SudokuSize; j++)
+                    for (int j = 0; j < ConstantData.SudokuSize; j++)
                     {
                         CheckCell(i, j);
                     }
@@ -42,29 +43,34 @@ namespace SudokuSolver.Core
                 _firstCheck = false;
             } while (_changeMade);
             Console.WriteLine("Direct checks done");
+            if (IsSudokuSolved()) goto verify;
 
             // Check numbers
             do
             {
                 _changeMade = false;
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
-                    Candidates value = CandidateUtils.FromInt(i+1);
+                    Candidates value = CandidateUtils.FromInt(i + 1);
                     CheckNumberByRow(value);
                     CheckNumberByColumn(value);
                     CheckNumberByFrame(value);
                 }
             } while (_changeMade);
             Console.WriteLine("Number checks done");
+            if (IsSudokuSolved()) goto verify;
 
+            // Hidden Pair/Triple
+
+            verify:
             // Verify solution
             if (Verifier.VerifySudoku(_filledSudoku))
             {
                 Console.WriteLine("Sudoku verified!");
-                int[,] solution = new int[Constants.SudokuSize, Constants.SudokuSize];
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                int[,] solution = new int[ConstantData.SudokuSize, ConstantData.SudokuSize];
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
-                    for (int j = 0; j < Constants.SudokuSize; j++)
+                    for (int j = 0; j < ConstantData.SudokuSize; j++)
                     {
                         solution[i, j] = CandidateUtils.ToInt(_filledSudoku[i, j]);
                     }
@@ -84,10 +90,10 @@ namespace SudokuSolver.Core
 
             Candidates[] row = ArrayUtils<Candidates>.GetRow(_filledSudoku, r);
             Candidates[] column = ArrayUtils<Candidates>.GetColumn(_filledSudoku, c);
-            int frameRowStart = Convert.ToInt32(Math.Floor((double)(r / Constants.FrameSize))) * Constants.FrameSize;
-            int frameColStart = Convert.ToInt32(Math.Floor((double)(c / Constants.FrameSize))) * Constants.FrameSize;
-            Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, frameRowStart, frameColStart, Constants.FrameSize);
-            Candidates candidates = Searcher.SearchCandidates(row, column, frame);
+            int frameRowStart = Convert.ToInt32(Math.Floor((double)(r / ConstantData.FrameSize))) * ConstantData.FrameSize;
+            int frameColStart = Convert.ToInt32(Math.Floor((double)(c / ConstantData.FrameSize))) * ConstantData.FrameSize;
+            Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, frameRowStart, frameColStart, ConstantData.FrameSize);
+            Candidates candidates = NakedSingles.Search(row, column, frame);
             if (candidates == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUnsolvable, $"No candidates at row {r}, column {c}");
             _filledSudoku[r, c] = candidates;
             if ((candidates & (candidates - 1)) == 0)
@@ -106,10 +112,10 @@ namespace SudokuSolver.Core
 
         private void CheckNumberByRow(Candidates value)
         {
-            for (int i = 0; i < Constants.SudokuSize; i++)
+            for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 Candidates[] row = ArrayUtils<Candidates>.GetRow(_filledSudoku, i);
-                int res = Searcher.SearchNumberCellValueInArray(row, value);
+                int res = HiddenSingles.SearchInArray(row, value);
                 if (res != -1)
                 {
                     _filledSudoku[i, res] = value;
@@ -117,19 +123,19 @@ namespace SudokuSolver.Core
                     _changeMade = true;
                     UpdateCellsFromRow(i, value);
                     UpdateCellsFromColumn(res, value);
-                    int frameRowStart = Convert.ToInt32(Math.Floor((double)(i / Constants.FrameSize))) * Constants.FrameSize;
-                    int frameColStart = Convert.ToInt32(Math.Floor((double)(res / Constants.FrameSize))) * Constants.FrameSize;
+                    int frameRowStart = Convert.ToInt32(Math.Floor((double)(i / ConstantData.FrameSize))) * ConstantData.FrameSize;
+                    int frameColStart = Convert.ToInt32(Math.Floor((double)(res / ConstantData.FrameSize))) * ConstantData.FrameSize;
                     UpdateCellsFromFrame(frameRowStart, frameColStart, value);
                 }
-            }            
+            }
         }
 
         private void CheckNumberByColumn(Candidates value)
         {
-            for (int i = 0; i < Constants.SudokuSize; i++)
+            for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 Candidates[] column = ArrayUtils<Candidates>.GetColumn(_filledSudoku, i);
-                int res = Searcher.SearchNumberCellValueInArray(column, value);
+                int res = HiddenSingles.SearchInArray(column, value);
                 if (res != -1)
                 {
                     _filledSudoku[res, i] = value;
@@ -137,21 +143,21 @@ namespace SudokuSolver.Core
                     _changeMade = true;
                     UpdateCellsFromRow(res, value);
                     UpdateCellsFromColumn(i, value);
-                    int frameRowStart = Convert.ToInt32(Math.Floor((double)(res / Constants.FrameSize))) * Constants.FrameSize;
-                    int frameColStart = Convert.ToInt32(Math.Floor((double)(i / Constants.FrameSize))) * Constants.FrameSize;
+                    int frameRowStart = Convert.ToInt32(Math.Floor((double)(res / ConstantData.FrameSize))) * ConstantData.FrameSize;
+                    int frameColStart = Convert.ToInt32(Math.Floor((double)(i / ConstantData.FrameSize))) * ConstantData.FrameSize;
                     UpdateCellsFromFrame(frameRowStart, frameColStart, value);
                 }
-            }  
+            }
         }
 
         private void CheckNumberByFrame(Candidates value)
         {
-            for (int i = 0; i < Constants.SudokuSize; i += Constants.FrameSize)
+            for (int i = 0; i < ConstantData.SudokuSize; i += ConstantData.FrameSize)
             {
-                for (int j = 0; j < Constants.SudokuSize; j += Constants.FrameSize)
+                for (int j = 0; j < ConstantData.SudokuSize; j += ConstantData.FrameSize)
                 {
-                    Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, i, j, Constants.FrameSize);
-                    var res = Searcher.SearchNumberCellValueInFrame(frame, value);
+                    Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, i, j, ConstantData.FrameSize);
+                    var res = HiddenSingles.SearchInFrame(frame, value);
                     if (res.Item1 != -1)
                     {
                         _filledSudoku[res.Item1 + i, res.Item2 + j] = value;
@@ -167,7 +173,7 @@ namespace SudokuSolver.Core
 
         private void UpdateCell(int r, int c, Candidates value)
         {
-            if (((_filledSudoku[r,c] & value) == 0) || (_filledSudoku[r,c] == value)) return;
+            if (((_filledSudoku[r, c] & value) == 0) || (_filledSudoku[r, c] == value)) return;
             _filledSudoku[r, c] &= ~value;
 
             if ((_filledSudoku[r, c] & (_filledSudoku[r, c] - 1)) == 0)
@@ -175,8 +181,8 @@ namespace SudokuSolver.Core
                 Console.WriteLine($"Value {_filledSudoku[r, c]} found in {r},{c} while updating");
                 UpdateCellsFromRow(r, _filledSudoku[r, c]);
                 UpdateCellsFromColumn(c, _filledSudoku[r, c]);
-                int frameRowStart = Convert.ToInt32(Math.Floor((double)(r / Constants.FrameSize))) * 3;
-                int frameColStart = Convert.ToInt32(Math.Floor((double)(c / Constants.FrameSize))) * 3;
+                int frameRowStart = Convert.ToInt32(Math.Floor((double)(r / ConstantData.FrameSize))) * 3;
+                int frameColStart = Convert.ToInt32(Math.Floor((double)(c / ConstantData.FrameSize))) * 3;
                 UpdateCellsFromFrame(frameRowStart, frameColStart, _filledSudoku[r, c]);
             }
             else
@@ -187,7 +193,7 @@ namespace SudokuSolver.Core
 
         private void UpdateCellsFromRow(int r, Candidates value)
         {
-            for (int i = 0; i < Constants.SudokuSize; i++)
+            for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 UpdateCell(r, i, value);
             }
@@ -195,7 +201,7 @@ namespace SudokuSolver.Core
 
         private void UpdateCellsFromColumn(int c, Candidates value)
         {
-            for (int i = 0; i < Constants.SudokuSize; i++)
+            for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 UpdateCell(i, c, value);
             }
@@ -203,13 +209,31 @@ namespace SudokuSolver.Core
 
         private void UpdateCellsFromFrame(int startRow, int startColumn, Candidates value)
         {
-            for (int i = startRow; i < startRow + Constants.FrameSize; i++)
+            for (int i = startRow; i < startRow + ConstantData.FrameSize; i++)
             {
-                for (int j = startColumn; j < startColumn + Constants.FrameSize; j++)
+                for (int j = startColumn; j < startColumn + ConstantData.FrameSize; j++)
                 {
                     UpdateCell(i, j, value);
                 }
             }
+        }
+
+        private bool IsCellSolved(Candidates cell)
+        {
+            return cell != Candidates.None && (cell & (cell - 1)) == 0;
+        }
+
+        private bool IsSudokuSolved()
+        {
+            for (int r = 0; r < ConstantData.SudokuSize; r++)
+            {
+                for (int c = 0; c < ConstantData.SudokuSize; c++)
+                {
+                    if (!IsCellSolved(_filledSudoku[r, c]))
+                        return false;
+                }
+            }
+            return true;
         }
     }
 }

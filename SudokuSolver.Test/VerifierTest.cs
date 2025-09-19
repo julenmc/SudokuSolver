@@ -79,7 +79,7 @@ namespace SudokuSolver.Test
         {
             Candidates[,] sudoku = FilledSudoku;
             sudoku[1, 1] = Candidates.One;
-            Assert.IsFalse(Verifier.VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(sudoku, 0, 0, Constants.FrameSize)));
+            Assert.IsFalse(Verifier.VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(sudoku, 0, 0, ConstantData.FrameSize)));
         }
 
         #region InputError

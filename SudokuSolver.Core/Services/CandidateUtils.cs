@@ -1,4 +1,6 @@
-namespace SudokuSolver.Core
+using SudokuSolver.Core.Constants;
+
+namespace SudokuSolver.Core.Services
 {
     internal static class CandidateUtils
     {

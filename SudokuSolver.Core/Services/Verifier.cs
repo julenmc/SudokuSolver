@@ -1,17 +1,19 @@
-namespace SudokuSolver.Core
+using SudokuSolver.Core.Constants;
+
+namespace SudokuSolver.Core.Services
 {
     internal static class Verifier
     {
         internal static bool VerifySudoku(Candidates[,] matrix)
         {
             // Chek input
-            if (matrix.GetLength(0) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
-            if (matrix.GetLength(1) != Constants.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
+            if (matrix.GetLength(0) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
+            if (matrix.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
 
             try
             {
                 // Check rows
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
                     try
                     {
@@ -37,7 +39,7 @@ namespace SudokuSolver.Core
                 }
 
                 // Check columns
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
                     try
                     {
@@ -63,10 +65,10 @@ namespace SudokuSolver.Core
                 }
 
                 // Check frames
-                double frameNum = Math.Pow(Constants.SudokuSize, 2) / Math.Pow(Constants.FrameSize, 2);
+                double frameNum = Math.Pow(ConstantData.SudokuSize, 2) / Math.Pow(ConstantData.FrameSize, 2);
                 int rowStart = 0;
                 int columnStart = 0;
-                int iterations = Constants.SudokuSize / Constants.FrameSize;
+                int iterations = ConstantData.SudokuSize / ConstantData.FrameSize;
                 for (int i = 0; i < iterations; i++)
                 {
                     columnStart = 0;
@@ -74,12 +76,12 @@ namespace SudokuSolver.Core
                     {
                         try
                         {
-                            if (!VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(matrix, rowStart, columnStart, Constants.FrameSize)))
+                            if (!VerifyFrame(ArrayUtils<Candidates>.Slice2DArray(matrix, rowStart, columnStart, ConstantData.FrameSize)))
                             {
                                 Console.WriteLine($"Frame in {i}{j} has a repeated value");
                                 return false;
                             }
-                            columnStart += Constants.FrameSize;
+                            columnStart += ConstantData.FrameSize;
                         }
                         catch (SudokuError ex)
                         {
@@ -95,7 +97,7 @@ namespace SudokuSolver.Core
                             }
                         }
                     }
-                    rowStart += Constants.FrameSize;
+                    rowStart += ConstantData.FrameSize;
                 }
 
                 return true;
@@ -133,13 +135,13 @@ namespace SudokuSolver.Core
             }
             return posibles == Candidates.None;
         }
-        
+
         internal static bool VerifyFrame(Candidates[,] frame)
         {
             Candidates posibles = Candidates.All;
-            for (int i = 0; i < Constants.FrameSize; i++)
+            for (int i = 0; i < ConstantData.FrameSize; i++)
             {
-                for (int j = 0; j < Constants.FrameSize; j++)
+                for (int j = 0; j < ConstantData.FrameSize; j++)
                 {
                     if (frame[i, j] == Candidates.None) throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError);
                     if ((frame[i, j] & (frame[i, j] - 1)) != 0) throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError);

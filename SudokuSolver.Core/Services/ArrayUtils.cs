@@ -1,11 +1,13 @@
-namespace SudokuSolver.Core
+using SudokuSolver.Core.Constants;
+
+namespace SudokuSolver.Core.Services
 {
     internal static class ArrayUtils<T>
     {
         internal static T[] GetColumn(T[,] matrix, int columnNumber)
         {
-            var result = new T[Constants.SudokuSize];
-            for (int r = 0; r < Constants.SudokuSize; r++)
+            var result = new T[ConstantData.SudokuSize];
+            for (int r = 0; r < ConstantData.SudokuSize; r++)
             {
                 result[r] = matrix[r, columnNumber];
             }
@@ -14,8 +16,8 @@ namespace SudokuSolver.Core
 
         internal static T[] GetRow(T[,] matrix, int rowNumber)
         {
-            var result = new T[Constants.SudokuSize];
-            for (int c = 0; c < Constants.SudokuSize; c++)
+            var result = new T[ConstantData.SudokuSize];
+            for (int c = 0; c < ConstantData.SudokuSize; c++)
             {
                 result[c] = matrix[rowNumber, c];
             }

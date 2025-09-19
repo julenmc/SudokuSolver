@@ -1,4 +1,5 @@
-﻿using SudokuSolver.Core;
+﻿using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Controllers;
 
 namespace SudokuSolver.ConsoleApp
 {
@@ -88,13 +89,13 @@ namespace SudokuSolver.ConsoleApp
 
             try
             {
-                Manager manager = new Manager(VeryHardSudoku);
+                SudokuController manager = new SudokuController(HardSudoku);
                 int[,] solution = manager.SolveSudoku();
 
                 Console.WriteLine("Sudoku completed! Result:");
-                for (int i = 0; i < Constants.SudokuSize; i++)
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
-                    for (int j = 0; j < Constants.SudokuSize; j++)
+                    for (int j = 0; j < ConstantData.SudokuSize; j++)
                     {
                         Console.Write($"{solution[i, j]} ");
                     }

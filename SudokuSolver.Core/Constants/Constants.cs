@@ -1,4 +1,4 @@
-namespace SudokuSolver.Core
+namespace SudokuSolver.Core.Constants
 {
     [Flags]
     internal enum Candidates : ushort
@@ -16,7 +16,7 @@ namespace SudokuSolver.Core
         All = (1 << 9) - 1  // 0b111111111
     }
 
-    public static class Constants
+    public static class ConstantData
     {
         public static int SudokuSize = 9;
         internal static int FrameSize = 3;
