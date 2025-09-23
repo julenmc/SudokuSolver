@@ -1,4 +1,7 @@
-using SudokuSolver.Core;
+using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Enums;
+using SudokuSolver.Core.Models;
+using SudokuSolver.Core.Services;
 
 namespace SudokuSolver.Test
 {
@@ -132,7 +135,7 @@ namespace SudokuSolver.Test
             }
             catch (SudokuError ex)
             {
-                if (ex.Type == SudokuError.ErrorType.ColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.ArrayCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }

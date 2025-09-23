@@ -1,4 +1,6 @@
 ﻿using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Enums;
+using SudokuSolver.Core.Models;
 
 namespace SudokuSolver.Core.Services
 {

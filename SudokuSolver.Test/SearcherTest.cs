@@ -1,4 +1,7 @@
-﻿using SudokuSolver.Core;
+﻿using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Enums;
+using SudokuSolver.Core.Models;
+using SudokuSolver.Core.Services;
 
 namespace SudokuSolver.Test
 {
@@ -15,7 +18,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
                 { Candidates.None, Candidates.None, Candidates.None },
             };
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -28,7 +31,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
                 { Candidates.None, Candidates.None, Candidates.None },
             };
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -41,7 +44,7 @@ namespace SudokuSolver.Test
                 { Candidates.Three, Candidates.Four, Candidates.Five },
                 { Candidates.Six, Candidates.Seven, Candidates.Eight },
             };
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -55,7 +58,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
             };
 
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -69,7 +72,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Eight },
             };
 
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -83,7 +86,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Eight },
             };
 
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -97,7 +100,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Eight },
             };
 
-            Assert.AreEqual(Candidates.Nine, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine, NakedSingles.Search(row, column, frame));
         }
 
         #region InputError
@@ -114,7 +117,7 @@ namespace SudokuSolver.Test
             };
             try
             {
-                Searcher.SearchCandidates(row, column, frame);
+                NakedSingles.Search(row, column, frame);
                 Assert.Fail();
             }
             catch (SudokuError ex)
@@ -137,12 +140,12 @@ namespace SudokuSolver.Test
             };
             try
             {
-                Searcher.SearchCandidates(row, column, frame);
+                NakedSingles.Search(row, column, frame);
                 Assert.Fail();
             }
             catch (SudokuError ex)
             {
-                if (ex.Type == SudokuError.ErrorType.ColumnCountError) Console.WriteLine($"OK. Error: {ex.Type}");
+                if (ex.Type == SudokuError.ErrorType.ArrayCountError) Console.WriteLine($"OK. Error: {ex.Type}");
                 else Assert.Fail();
             }
         }
@@ -158,7 +161,7 @@ namespace SudokuSolver.Test
             };
             try
             {
-                Searcher.SearchCandidates(row, column, frame);
+                NakedSingles.Search(row, column, frame);
                 Assert.Fail();
             }
             catch (SudokuError ex)
@@ -180,7 +183,7 @@ namespace SudokuSolver.Test
             };
             try
             {
-                Searcher.SearchCandidates(row, column, frame);
+                NakedSingles.Search(row, column, frame);
                 Assert.Fail();
             }
             catch (SudokuError ex)
@@ -206,7 +209,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
                 { Candidates.None, Candidates.None, Candidates.None },
             };
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -219,7 +222,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
                 { Candidates.None, Candidates.None, Candidates.None },
             };
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -232,7 +235,7 @@ namespace SudokuSolver.Test
                 { Candidates.Three, Candidates.Four, Candidates.Five },
                 { Candidates.Six, Candidates.Seven, Candidates.None },
             };
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -246,7 +249,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.None },
             };
 
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -260,7 +263,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Seven },
             };
 
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -274,7 +277,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Seven },
             };
 
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
 
         [TestMethod]
@@ -288,7 +291,7 @@ namespace SudokuSolver.Test
                 { Candidates.None, Candidates.None, Candidates.Seven },
             };
 
-            Assert.AreEqual(Candidates.Nine | Candidates.Eight, Searcher.SearchCandidates(row, column, frame));
+            Assert.AreEqual(Candidates.Nine | Candidates.Eight, NakedSingles.Search(row, column, frame));
         }
     }
 
@@ -309,7 +312,7 @@ namespace SudokuSolver.Test
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Assert.AreEqual(0, Searcher.SearchNumberCellValueInArray(array, Candidates.One));
+            Assert.AreEqual(0, HiddenSingles.Search(array, Candidates.One));
         }
 
         [TestMethod]
@@ -320,7 +323,7 @@ namespace SudokuSolver.Test
                 { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            var res = Searcher.SearchNumberCellValueInFrame(frame, Candidates.One);
+            var res = HiddenSingles.Search(frame, Candidates.One);
             Assert.AreEqual(0, res.Item1);
             Assert.AreEqual(0, res.Item2);
         }
@@ -339,7 +342,7 @@ namespace SudokuSolver.Test
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Assert.AreEqual(-1, Searcher.SearchNumberCellValueInArray(array, Candidates.One));
+            Assert.AreEqual(-1, HiddenSingles.Search(array, Candidates.One));
         }
     }
 }

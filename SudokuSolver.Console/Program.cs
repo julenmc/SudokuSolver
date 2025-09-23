@@ -1,5 +1,6 @@
 ﻿using SudokuSolver.Core.Constants;
-using SudokuSolver.Core.Controllers;
+using SudokuSolver.Core.Services;
+using SudokuSolver.Core.Models;
 
 namespace SudokuSolver.ConsoleApp
 {
@@ -89,7 +90,7 @@ namespace SudokuSolver.ConsoleApp
 
             try
             {
-                SudokuController manager = new SudokuController(HardSudoku);
+                SudokuSolvingService manager = new SudokuSolvingService(HardSudoku);
                 int[,] solution = manager.SolveSudoku();
 
                 Console.WriteLine("Sudoku completed! Result:");

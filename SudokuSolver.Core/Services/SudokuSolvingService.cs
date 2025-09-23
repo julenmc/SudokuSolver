@@ -1,20 +1,21 @@
 using SudokuSolver.Core.Constants;
-using SudokuSolver.Core.Services;
+using SudokuSolver.Core.Enums;
+using SudokuSolver.Core.Models;
 
-namespace SudokuSolver.Core.Controllers
+namespace SudokuSolver.Core.Services
 {
-    public class SudokuController
+    public class SudokuSolvingService
     {
         private Candidates[,] _unfilledSudoku;
         private Candidates[,] _filledSudoku;
         bool _changeMade = false;
         bool _firstCheck = true;
 
-        public SudokuController(int[,] sudoku)
+        public SudokuSolvingService(int[,] sudoku)
         {
             // Chek input
             if (sudoku.GetLength(0) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
-            if (sudoku.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
+            if (sudoku.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
 
             _unfilledSudoku = new Candidates[ConstantData.SudokuSize, ConstantData.SudokuSize];
             _filledSudoku = _unfilledSudoku;
@@ -115,7 +116,7 @@ namespace SudokuSolver.Core.Controllers
             for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 Candidates[] row = ArrayUtils<Candidates>.GetRow(_filledSudoku, i);
-                int res = HiddenSingles.SearchInArray(row, value);
+                int res = HiddenSingles.Search(row, value);
                 if (res != -1)
                 {
                     _filledSudoku[i, res] = value;
@@ -135,7 +136,7 @@ namespace SudokuSolver.Core.Controllers
             for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
                 Candidates[] column = ArrayUtils<Candidates>.GetColumn(_filledSudoku, i);
-                int res = HiddenSingles.SearchInArray(column, value);
+                int res = HiddenSingles.Search(column, value);
                 if (res != -1)
                 {
                     _filledSudoku[res, i] = value;
@@ -157,7 +158,7 @@ namespace SudokuSolver.Core.Controllers
                 for (int j = 0; j < ConstantData.SudokuSize; j += ConstantData.FrameSize)
                 {
                     Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, i, j, ConstantData.FrameSize);
-                    var res = HiddenSingles.SearchInFrame(frame, value);
+                    var res = HiddenSingles.Search(frame, value);
                     if (res.Item1 != -1)
                     {
                         _filledSudoku[res.Item1 + i, res.Item2 + j] = value;

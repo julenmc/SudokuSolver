@@ -1,10 +1,11 @@
 using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Enums;
 
 namespace SudokuSolver.Core.Services
 {
     internal static class HiddenSingles
     {
-        internal static int SearchInArray(Candidates[] array, Candidates value)
+        internal static int Search(Candidates[] array, Candidates value)
         {
             int foundIndex = -1;
             for (int i = 0; i < ConstantData.SudokuSize; i++)
@@ -25,7 +26,7 @@ namespace SudokuSolver.Core.Services
             return foundIndex;
         }
 
-        internal static (int, int) SearchInFrame(Candidates[,] frame, Candidates value)
+        internal static (int, int) Search(Candidates[,] frame, Candidates value)
         {
             int foundRowIndex = -1;
             int foundColumnIndex = -1;

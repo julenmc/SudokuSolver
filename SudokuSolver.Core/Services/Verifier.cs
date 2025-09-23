@@ -1,4 +1,6 @@
 using SudokuSolver.Core.Constants;
+using SudokuSolver.Core.Enums;
+using SudokuSolver.Core.Models;
 
 namespace SudokuSolver.Core.Services
 {
@@ -8,7 +10,7 @@ namespace SudokuSolver.Core.Services
         {
             // Chek input
             if (matrix.GetLength(0) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
-            if (matrix.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ColumnCountError);
+            if (matrix.GetLength(1) != ConstantData.SudokuSize) throw new SudokuError(SudokuError.ErrorType.ArrayCountError);
 
             try
             {
