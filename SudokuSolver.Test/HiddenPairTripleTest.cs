@@ -17,14 +17,14 @@ namespace SudokuSolver.Test
                 Candidates.One,
                 Candidates.Two | Candidates.Three,
                 Candidates.Two | Candidates.Three | Candidates.Four,
-                Candidates.Two | Candidates.Five,
+                Candidates.Four | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(2, ret.Length);
             CollectionAssert.AreEqual(new int[] { 1, 2 }, ret);
@@ -37,14 +37,14 @@ namespace SudokuSolver.Test
                 Candidates.One,
                 Candidates.Two | Candidates.Three,
                 Candidates.Four,
-                Candidates.Two | Candidates.Five,
+                Candidates.Four | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(2, ret.Length);
             CollectionAssert.AreEqual(new int[] { 1, -1 }, ret);
@@ -57,14 +57,14 @@ namespace SudokuSolver.Test
                 Candidates.One,
                 Candidates.Two | Candidates.Three,
                 Candidates.Two | Candidates.Three | Candidates.Four,
-                Candidates.Two | Candidates.Three | Candidates.Five,
+                Candidates.Two | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(2, ret.Length);
             CollectionAssert.AreEqual(new int[] { -1, -1 }, ret);
@@ -79,10 +79,10 @@ namespace SudokuSolver.Test
         {
             Candidates[,] matrix = {
                 { Candidates.One, Candidates.Two | Candidates.Three, Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.Two | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(2, ret.Length);
             CellPointer[] expected =
@@ -101,11 +101,11 @@ namespace SudokuSolver.Test
         public void NoPairInMatrix()
         {
             Candidates[,] matrix = {
-                { Candidates.One, Candidates.Two | Candidates.Five, Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.Two | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.One, Candidates.Six | Candidates.Five, Candidates.Two | Candidates.Three | Candidates.Four },
+                { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(2, ret.Length);
             CellPointer[] expected =
@@ -125,10 +125,10 @@ namespace SudokuSolver.Test
         {
             Candidates[,] matrix = {
                 { Candidates.One, Candidates.Two | Candidates.Three, Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.Two | Candidates.Three, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.Two | Candidates.Four, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(2, ret.Length);
             CellPointer[] expected =
@@ -154,14 +154,14 @@ namespace SudokuSolver.Test
                 Candidates.One | Candidates.Two | Candidates.Three,
                 Candidates.One | Candidates.Two | Candidates.Three,
                 Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four,
-                Candidates.Two | Candidates.Five,
+                Candidates.Four | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(3, ret.Length);
             CollectionAssert.AreEqual(new int[] { 0, 1, 2 }, ret);
@@ -174,14 +174,14 @@ namespace SudokuSolver.Test
                 Candidates.Five,
                 Candidates.One | Candidates.Two | Candidates.Three,
                 Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four,
-                Candidates.Two | Candidates.Five,
+                Candidates.Four | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(3, ret.Length);
             CollectionAssert.AreEqual(new int[] { 1, 2, -1 }, ret);
@@ -191,17 +191,17 @@ namespace SudokuSolver.Test
         public void TooManyTripleInArray()
         {
             Candidates[] array = {
-                Candidates.One,
-                Candidates.Two | Candidates.Three,
-                Candidates.Two | Candidates.Three | Candidates.Four,
-                Candidates.Two | Candidates.Three | Candidates.Five,
+                Candidates.One | Candidates.Two | Candidates.Three,
+                Candidates.One | Candidates.Two | Candidates.Three,
+                Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four,
+                Candidates.Two | Candidates.Five,
                 Candidates.Five | Candidates.Six,
                 Candidates.Six | Candidates.Seven,
                 Candidates.Seven | Candidates.Eight,
                 Candidates.Eight | Candidates.Nine,
                 Candidates.Eight | Candidates.Nine
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             int[] ret = HiddenPairTriple.Search(array, values);
             Assert.AreEqual(3, ret.Length);
             CollectionAssert.AreEqual(new int[] { -1, -1, -1 }, ret);
@@ -216,10 +216,10 @@ namespace SudokuSolver.Test
         {
             Candidates[,] matrix = {
                 { Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.Two | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(3, ret.Length);
             CellPointer[] expected =
@@ -239,11 +239,11 @@ namespace SudokuSolver.Test
         public void NoTripleInMatrix()
         {
             Candidates[,] matrix = {
-                { Candidates.Five | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.Two | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.Five | Candidates.Six | Candidates.Seven, Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four },
+                { Candidates.Four | Candidates.Five, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(3, ret.Length);
             CellPointer[] expected =
@@ -264,10 +264,10 @@ namespace SudokuSolver.Test
         {
             Candidates[,] matrix = {
                 { Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three, Candidates.One | Candidates.Two | Candidates.Three | Candidates.Four },
-                { Candidates.One | Candidates.Two | Candidates.Three, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
+                { Candidates.One | Candidates.Four, Candidates.Five | Candidates.Six, Candidates.Six | Candidates.Seven },
                 { Candidates.Seven | Candidates.Eight, Candidates.Eight | Candidates.Nine, Candidates.Eight | Candidates.Nine }
             };
-            Candidates[] values = { Candidates.One, Candidates.Two, Candidates.Three };
+            Candidates values = Candidates.One | Candidates.Two | Candidates.Three;
             CellPointer[] ret = Search(matrix, values);
             Assert.AreEqual(3, ret.Length);
             CellPointer[] expected =

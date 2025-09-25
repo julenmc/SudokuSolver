@@ -5,69 +5,59 @@ namespace SudokuSolver.Core.Services
 {
     internal static class HiddenPairTriple
     {
-        internal static int[] Search(Candidates[] array, Candidates[] values)   // TODO: values could use "|" and not be an array
+        internal static int[] Search(Candidates[] array, Candidates values) 
         {
-            int[] ret = GiveErrorArray(values.Length);
+            int candLen = CountCandidates(values);
+            int[] ret = GiveErrorArray(candLen);
 
             for (int i = 0; i < array.Length; i++)
             {
-                bool stopped = false;
-                for (int j = 0; j < values.Length; j++)
+                if ((array[i] & values) == 0)               // The cell does not contain neither of the candidates
                 {
-                    if (array[i] == values[j])
-                    {
-                        return GiveErrorArray(values.Length); // The candidate is already assigned
-                    }
-                    else if ((array[i] & values[j]) == 0)     // The cell does not contain the candidate
-                    {
-                        stopped = true;
-                        break;
-                    }
+                    continue;
                 }
-                if (stopped) continue;
+                else if ((array[i] & values) != values)      // Contains at least one of the candidates, no hidden pair/triple
+                {
+                    return GiveErrorArray(candLen);     
+                }
 
                 // Once reached to this point, the cell contains the candidates
-                for (int k = 0; k < values.Length; k++)
+                for (int k = 0; k < candLen; k++)
                 {
                     if (ret[k] == -1)
                     {
                         ret[k] = i;
                         break;
                     }
-                    else if (k == values.Length - 1)
+                    else if (k == candLen - 1)
                     {
-                        return GiveErrorArray(values.Length);     // Too many cells contain the values
+                        return GiveErrorArray(candLen);     // Too many cells contain the values
                     }
                 }
             }
             return ret;
         }
 
-        internal static CellPointer[] Search(Candidates[,] matrix, Candidates[] values) // TODO: values could use "|" and not be an array 
+        internal static CellPointer[] Search(Candidates[,] matrix, Candidates values) 
         {
-            CellPointer[] ret = GiveErrorMatrix(values.Length);
+            int candLen = CountCandidates(values);
+            CellPointer[] ret = GiveErrorMatrix(candLen);
 
             for (int i = 0; i < ConstantData.FrameSize; i++)
             {
                 for (int j = 0; j < ConstantData.FrameSize; j++)
                 {
-                    bool stopped = false;
-                    for (int v = 0; v < values.Length; v++)
+                    if ((matrix[i, j] & values) == 0)               // The cell does not contain the candidate
                     {
-                        if (matrix[i,j] == values[v])
-                        {
-                            return GiveErrorMatrix(values.Length); // The candidate is already assigned
-                        }
-                        else if ((matrix[i, j] & values[v]) == 0)     // The cell does not contain the candidate
-                        {
-                            stopped = true;
-                            break;
-                        }
+                        continue;
                     }
-                    if (stopped) continue;
+                    else if ((matrix[i, j] & values) != values)      // Contains at least one of the candidates, no hidden pair/triple
+                    {
+                        return GiveErrorMatrix(candLen);     
+                    }
 
                     // Once reached to this point, the cell contains the candidates
-                    for (int k = 0; k < values.Length; k++)
+                    for (int k = 0; k < candLen; k++)
                     {
                         if (ret[k].Row == -1)
                         {
@@ -75,14 +65,26 @@ namespace SudokuSolver.Core.Services
                             ret[k].Col = j;
                             break;
                         }
-                        else if (k == values.Length - 1)
+                        else if (k == candLen - 1)
                         {
-                            return GiveErrorMatrix(values.Length);     // Too many cells contain the values
+                            return GiveErrorMatrix(candLen);     // Too many cells contain the values
                         }
                     }
                 }                
             }
             return ret;
+        }
+
+        private static int CountCandidates(Candidates candidates)
+        {
+            int value = (int)candidates;
+            int count = 0;
+            while (value != 0)
+            {
+                count++;
+                value &= value - 1;
+            }
+            return count;
         }
 
         private static int[] GiveErrorArray(int len)

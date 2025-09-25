@@ -1,3 +1,3 @@
-Work in progress.
+Console, Library and Test projects to solve any kind of Sudoku.
 
-Tested with sudokus from level Easy to Hard. Can't solve yet very hard sudokus.
+Waiting for some time for the GUI

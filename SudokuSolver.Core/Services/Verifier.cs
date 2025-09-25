@@ -30,10 +30,12 @@ namespace SudokuSolver.Core.Services
                         switch (ex.Type)
                         {
                             case SudokuError.ErrorType.SudokuUncompletedError:
-                                throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+                                Console.WriteLine($"Empty cell at row {i}");
+                                return false;
 
                             case SudokuError.ErrorType.MultipleCandidatesError:
-                                throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+                                Console.WriteLine($"Multiple candidates in cell at row {i}");
+                                return false;
 
                             default: throw;
                         }
@@ -56,10 +58,12 @@ namespace SudokuSolver.Core.Services
                         switch (ex.Type)
                         {
                             case SudokuError.ErrorType.SudokuUncompletedError:
-                                throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+                                Console.WriteLine($"Empty cell at column {i}");
+                                return false;
 
                             case SudokuError.ErrorType.MultipleCandidatesError:
-                                throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+                                Console.WriteLine($"Multiple candidates in cell at column {i}");
+                                return false;
 
                             default: throw;
                         }
@@ -90,10 +94,12 @@ namespace SudokuSolver.Core.Services
                             switch (ex.Type)
                             {
                                 case SudokuError.ErrorType.SudokuUncompletedError:
-                                    throw new SudokuError(SudokuError.ErrorType.SudokuUncompletedError, $"Empty cell at row {i}");
+                                    Console.WriteLine($"Empty cell at frame {i},{j}");
+                                    return false;
 
                                 case SudokuError.ErrorType.MultipleCandidatesError:
-                                    throw new SudokuError(SudokuError.ErrorType.MultipleCandidatesError, $"Multiple candidates in cell at row {i}");
+                                    Console.WriteLine($"Multiple candidates at frame {i},{j}");
+                                    return false;
 
                                 default: throw;
                             }

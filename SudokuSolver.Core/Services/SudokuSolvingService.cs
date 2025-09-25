@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using SudokuSolver.Core.Constants;
 using SudokuSolver.Core.Enums;
 using SudokuSolver.Core.Models;
@@ -30,7 +31,7 @@ namespace SudokuSolver.Core.Services
 
         public int[,] SolveSudoku()
         {
-            // Direct check
+            // Naked singles
             do
             {
                 _changeMade = false;
@@ -38,33 +39,61 @@ namespace SudokuSolver.Core.Services
                 {
                     for (int j = 0; j < ConstantData.SudokuSize; j++)
                     {
-                        CheckCell(i, j);
+                        CheckNakedSingle(i, j);
                     }
                 }
                 _firstCheck = false;
             } while (_changeMade);
-            Console.WriteLine("Direct checks done");
-            if (IsSudokuSolved()) goto verify;
+            Console.WriteLine("Naked singles done");
+            if (IsSudokuSolved()) goto Verify;
 
-            // Check numbers
+            // Hidden singles
+            bool gotoHiddenPair = true;
+
+            HiddenSingles:
             do
             {
                 _changeMade = false;
                 for (int i = 0; i < ConstantData.SudokuSize; i++)
                 {
                     Candidates value = CandidateUtils.FromInt(i + 1);
-                    CheckNumberByRow(value);
-                    CheckNumberByColumn(value);
-                    CheckNumberByFrame(value);
+                    CheckHiddenSingleRow(value);
+                    CheckHiddenSingleColumn(value);
+                    CheckHiddenSingleFrame(value);
                 }
+                gotoHiddenPair = _changeMade | gotoHiddenPair;
             } while (_changeMade);
-            Console.WriteLine("Number checks done");
-            if (IsSudokuSolved()) goto verify;
+            Console.WriteLine("Hidden singles done");
+            if (IsSudokuSolved() || !gotoHiddenPair) goto Verify;
 
             // Hidden Pair/Triple
+            do
+            {
+                _changeMade = false;
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
+                {
+                    CheckHiddenPairInRow(i);
+                    CheckHiddenTripleInRow(i);
+                    CheckHiddenPairInColumn(i);
+                    CheckHiddenTripleInColumn(i);
+                }
+                for (int r = 0; r < ConstantData.SudokuSize; r += ConstantData.FrameSize)
+                {
+                    for (int c = 0; c < ConstantData.SudokuSize; c += ConstantData.FrameSize)
+                    {
+                        CheckHiddenPairFrame(r, c);
+                        CheckHiddenTripleFrame(r, c);
+                    }
+                }
+            } while (_changeMade);
+            gotoHiddenPair = false;
+            Console.WriteLine("Hidden pairs done");
+            if (IsSudokuSolved()) goto Verify;
+            else goto HiddenSingles;
 
-            verify:
+            Verify:
             // Verify solution
+            Console.WriteLine("Start verifing");
             if (Verifier.VerifySudoku(_filledSudoku))
             {
                 Console.WriteLine("Sudoku verified!");
@@ -81,11 +110,21 @@ namespace SudokuSolver.Core.Services
             }
             else
             {
+                Console.WriteLine("Unverified sudoku:");
+                for (int i = 0; i < ConstantData.SudokuSize; i++)
+                {
+                    for (int j = 0; j < ConstantData.SudokuSize; j++)
+                    {
+                        Console.Write($"{_filledSudoku[i, j]} ");
+                    }
+                    Console.WriteLine();
+                }
                 throw new Exception("Sudoku verify failed!");
             }
         }
 
-        private void CheckCell(int r, int c)
+        #region NakedSingle
+        private void CheckNakedSingle(int r, int c)
         {
             if ((_filledSudoku[r, c] != Candidates.None) && (_filledSudoku[r, c] & (_filledSudoku[r, c] - 1)) == 0) return;   // If already filled go to next
 
@@ -110,8 +149,10 @@ namespace SudokuSolver.Core.Services
                 Console.WriteLine($"Candidates at {r},{c}: {_filledSudoku[r, c]}");
             }
         }
+        #endregion
 
-        private void CheckNumberByRow(Candidates value)
+        #region HiddenSingle
+        private void CheckHiddenSingleRow(Candidates value)
         {
             for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
@@ -131,7 +172,7 @@ namespace SudokuSolver.Core.Services
             }
         }
 
-        private void CheckNumberByColumn(Candidates value)
+        private void CheckHiddenSingleColumn(Candidates value)
         {
             for (int i = 0; i < ConstantData.SudokuSize; i++)
             {
@@ -151,7 +192,7 @@ namespace SudokuSolver.Core.Services
             }
         }
 
-        private void CheckNumberByFrame(Candidates value)
+        private void CheckHiddenSingleFrame(Candidates value)
         {
             for (int i = 0; i < ConstantData.SudokuSize; i += ConstantData.FrameSize)
             {
@@ -171,10 +212,185 @@ namespace SudokuSolver.Core.Services
                 }
             }
         }
+        #endregion
+
+        #region HiddenPair
+        private void CheckHiddenPairInRow(int r)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j <= ConstantData.SudokuSize; j++)       // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    Candidates[] row = ArrayUtils<Candidates>.GetRow(_filledSudoku, r);
+                    Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j);
+                    int[] res = HiddenPairTriple.Search(row, values);
+                    if (res[1] != -1)
+                    {
+                        Console.WriteLine($"Hidden pairs ({values}) found at {r},{res[0]} and {r},{res[1]}");
+                        for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                        {
+                            Candidates candidate = CandidateUtils.FromInt(v);
+                            if ((candidate & values) == 0)
+                            {
+                                UpdateCell(r, res[0], candidate);
+                                UpdateCell(r, res[1], candidate);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckHiddenPairInColumn(int c)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j <= ConstantData.SudokuSize; j++)   // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    Candidates[] column = ArrayUtils<Candidates>.GetColumn(_filledSudoku, c);
+                    Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j);
+                    int[] res = HiddenPairTriple.Search(column, values);
+                    if (res[1] != -1)
+                    {
+                        Console.WriteLine($"Hidden pairs ({values}) found at {res[0]},{c} and {res[1]},{c}");
+                        for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                        {
+                            Candidates candidate = CandidateUtils.FromInt(v);
+                            if ((candidate & values) == 0)
+                            {
+                                UpdateCell(res[0], c, candidate);
+                                UpdateCell(res[1], c, candidate);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckHiddenPairFrame(int rowStart, int columnStart)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j <= ConstantData.SudokuSize; j++)   // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, rowStart, columnStart, ConstantData.FrameSize);
+                    Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j);
+                    HiddenPairTriple.CellPointer[] res = HiddenPairTriple.Search(frame, values);
+                    if (res[1].Row != -1)
+                    {
+                        Console.WriteLine($"Hidden pairs ({values}) found at {rowStart+res[0].Row},{columnStart+res[0].Col} and {rowStart+res[1].Row},{columnStart+res[1].Col}");
+                        for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                        {
+                            Candidates candidate = CandidateUtils.FromInt(v);
+                            if ((candidate & values) == 0)
+                            {
+                                UpdateCell(res[0].Row + rowStart, res[0].Col + columnStart, candidate);
+                                UpdateCell(res[1].Row + rowStart, res[1].Col + columnStart, candidate);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region HiddenTriple
+        private void CheckHiddenTripleInRow(int r)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j < ConstantData.SudokuSize; j++)       // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    for (int k = j + 1; k <= ConstantData.SudokuSize; k++)
+                    {
+                        Candidates[] row = ArrayUtils<Candidates>.GetRow(_filledSudoku, r);
+                        Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j) | CandidateUtils.FromInt(k);
+                        int[] res = HiddenPairTriple.Search(row, values);
+                        if (res[1] != -1)
+                        {
+                            Console.WriteLine($"Hidden triples ({values}) found at {r},{res[0]} / {r},{res[1]} / {r},{res[2]}");
+                            for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                            {
+                                Candidates candidate = CandidateUtils.FromInt(v);
+                                if ((candidate & values) == 0)
+                                {
+                                    UpdateCell(r, res[0], candidate);
+                                    UpdateCell(r, res[1], candidate);
+                                    UpdateCell(r, res[2], candidate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckHiddenTripleInColumn(int c)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j < ConstantData.SudokuSize; j++)   // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    for (int k = j + 1; k <= ConstantData.SudokuSize; k++)
+                    {
+                        Candidates[] column = ArrayUtils<Candidates>.GetColumn(_filledSudoku, c);
+                        Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j) | CandidateUtils.FromInt(k);
+                        int[] res = HiddenPairTriple.Search(column, values);
+                        if (res[1] != -1)
+                        {
+                            Console.WriteLine($"Hidden pairs ({values}) found at {res[0]},{c} / {res[1]},{c} / {res[2]},{c}");
+                            for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                            {
+                                Candidates candidate = CandidateUtils.FromInt(v);
+                                if ((candidate & values) == 0)
+                                {
+                                    UpdateCell(res[0], c, candidate);
+                                    UpdateCell(res[1], c, candidate);
+                                    UpdateCell(res[2], c, candidate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckHiddenTripleFrame(int rowStart, int columnStart)
+        {
+            for (int i = 1; i < ConstantData.SudokuSize; i++)
+            {
+                for (int j = i + 1; j < ConstantData.SudokuSize; j++)   // Starts from i + 1 so it doesnt repeat the combinations
+                {
+                    for (int k = j + 1; k <= ConstantData.SudokuSize; k++)
+                    {
+                        Candidates[,] frame = ArrayUtils<Candidates>.Slice2DArray(_filledSudoku, rowStart, columnStart, ConstantData.FrameSize);
+                        Candidates values = CandidateUtils.FromInt(i) | CandidateUtils.FromInt(j) | CandidateUtils.FromInt(k);
+                        HiddenPairTriple.CellPointer[] res = HiddenPairTriple.Search(frame, values);
+                        if (res[1].Row != -1)
+                        {
+                            Console.WriteLine($"Hidden pairs ({values}) found at {rowStart + res[0].Row},{columnStart + res[0].Col} / {rowStart + res[1].Row},{columnStart + res[1].Col} / {rowStart + res[2].Row},{columnStart + res[2].Col}");
+                            for (int v = 1; v < ConstantData.SudokuSize + 1; v++)   // Remove the rest of the candidates from the found cells
+                            {
+                                Candidates candidate = CandidateUtils.FromInt(v);
+                                if ((candidate & values) == 0)
+                                {
+                                    UpdateCell(res[0].Row + rowStart, res[0].Col + columnStart, candidate);
+                                    UpdateCell(res[1].Row + rowStart, res[1].Col + columnStart, candidate);
+                                    UpdateCell(res[2].Row + rowStart, res[2].Col + columnStart, candidate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
 
         private void UpdateCell(int r, int c, Candidates value)
         {
-            if (((_filledSudoku[r, c] & value) == 0) || (_filledSudoku[r, c] == value)) return;
+            Candidates contained = _filledSudoku[r, c] & value;
+            bool singleValue = (_filledSudoku[r, c] & (_filledSudoku[r, c] - 1)) == 0;
+            if (contained == Candidates.None || singleValue) return;
             _filledSudoku[r, c] &= ~value;
 
             if ((_filledSudoku[r, c] & (_filledSudoku[r, c] - 1)) == 0)
