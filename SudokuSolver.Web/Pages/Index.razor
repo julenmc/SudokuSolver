@@ -1,0 +1,70 @@
+﻿@page "/"
+
+@using SudokuSolver.Core.Services
+
+@* @inject SudokuSolvingService SudokuService *@
+
+<h1>Sudoku Solver</h1>
+
+<div class="sudoku-grid">
+    @for (int row = 0; row < 9; row++)
+    {
+        @for (int col = 0; col < 9; col++)
+        {
+            var currentRow = row;  // ← Captura el valor actual
+            var currentCol = col;  // ← Captura el valor actual
+            
+            <input type="text" 
+                   maxlength="1"
+                   class="cell"
+                   @bind="rawCells[currentRow, currentCol]">
+        }
+    }
+</div>
+
+<button @onclick="SolveSudoku">Solve</button>
+
+@code {
+    private string[,] rawCells = new string[9, 9];
+
+    private void SolveSudoku()
+    {
+        SudokuSolvingService service = new SudokuSolvingService(parsedCells);
+        try 
+        {
+            int[,] solved = service.SolveSudoku();
+            SetSolvedSudoku(solved);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception while solving: {ex.Message}");
+        }
+    }
+
+    private void SetSolvedSudoku(int[,] solved)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                rawCells[i,j] = solved[i,j].ToString();;
+            }
+        }
+    }
+
+    private int[,] parsedCells 
+    {
+        get
+        {
+            int[,] newCells = new int[9,9];
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    newCells[i,j] = string.IsNullOrEmpty(rawCells[i,j]) ? 0 : Int16.Parse(rawCells[i,j]);
+                }
+            }
+            return newCells;
+        }
+    }
+}

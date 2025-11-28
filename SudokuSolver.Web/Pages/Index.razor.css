@@ -1,0 +1,26 @@
+h1{
+    text-align: center;
+}
+
+.sudoku-grid {
+    width: 80%;
+    max-width: 500px;;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr); /* 9 columnas iguales */
+    gap: 2px; /* Espacio entre celdas */
+}
+
+.cell {
+    width: 100%; /* Ocupa todo el ancho de la celda grid */
+    aspect-ratio: 1; /* Mantiene relación cuadrado */
+    text-align: center;
+    font-size: 1.2em;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+button {
+    text-align: center;
+    margin:auto;
+}
